@@ -83,7 +83,7 @@ func (c *Client) Register(svc string, node sd.Node, ttl int64) (func() error, er
 
 func (c *Client) Watch(svc string, ch chan<- struct{}) func() error {
 	ctx, cancel := context.WithCancel(c.ctx)
-	wch := c.cli.Watch(c.ctx, c.servicePrefix(svc)+"/", clientv3.WithPrefix())
+	wch := c.cli.Watch(c.ctx, c.servicePrefix(svc), clientv3.WithPrefix())
 	go func() {
 		for {
 			select {
@@ -121,9 +121,9 @@ func (c *Client) GetNodes(svc string) ([]sd.Node, error) {
 }
 
 func (c *Client) makeKey(svc string, node sd.Node) string {
-	return fmt.Sprintf("%s/%s", c.servicePrefix(svc), node.ID)
+	return c.servicePrefix(svc) + node.ID
 }
 
 func (c *Client) servicePrefix(svc string) string {
-	return fmt.Sprintf("%s/%s", c.prefix, svc)
+	return fmt.Sprintf("%s/%s/", c.prefix, svc)
 }
