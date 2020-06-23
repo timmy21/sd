@@ -48,8 +48,8 @@ func (s *Service) Unsubscribe(ch chan<- sd.Event) {
 
 func (s *Service) run() {
 	ch := make(chan struct{})
-	stopWatch := s.client.Watch(s.name, ch)
-	defer stopWatch()
+	cleanup := s.client.Watch(s.name, ch)
+	defer cleanup()
 	for {
 		select {
 		case _, ok := <-ch:

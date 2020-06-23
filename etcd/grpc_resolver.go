@@ -49,8 +49,7 @@ type etcdResolver struct {
 	wg     sync.WaitGroup
 }
 
-func (e *etcdResolver) ResolveNow(resolver.ResolveNowOptions) {
-}
+func (e *etcdResolver) ResolveNow(resolver.ResolveNowOptions) {}
 
 func (e *etcdResolver) Close() {
 	e.cancel()
