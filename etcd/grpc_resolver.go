@@ -2,7 +2,6 @@ package etcd
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -26,7 +25,6 @@ type etcdBuilder struct {
 }
 
 func (b *etcdBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
-	fmt.Println("===========")
 	ctx, cancel := context.WithCancel(context.Background())
 	e := &etcdResolver{
 		svc:    b.svc,

@@ -42,15 +42,17 @@ func main() {
 
 	ch := make(chan sd.Event)
 	svc.Subscribe(ch)
+	defer svc.Unsubscribe(ch)
 
 	inst := sd.Instance{
 		ID:   *instID,
 		Addr: *instAddr,
 	}
-	err = svc.Register(inst, *instTTL)
+	cleanup, err := svc.Register(inst, *instTTL)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer cleanup()
 
 	for evt := range ch {
 		if evt.Err != nil {

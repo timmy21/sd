@@ -81,10 +81,11 @@ func main() {
 		ID:   *addr,
 		Addr: *addr,
 	}
-	err = svc.Register(inst, *instTTL)
+	cleanup, err := svc.Register(inst, *instTTL)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer cleanup()
 
 	s := grpc.NewServer()
 	pb.RegisterGreeterServer(s, &server{})

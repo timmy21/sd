@@ -38,7 +38,7 @@ func NewClient(ctx context.Context, endpoints []string, prefix string, options .
 	}, err
 }
 
-func (c *Client) Register(svc string, inst sd.Instance, ttl int64) (func() error, error) {
+func (c *Client) Register(svc string, inst sd.Instance, ttl int64) (func(), error) {
 	val, err := json.Marshal(inst)
 	if err != nil {
 		return nil, nil
@@ -66,22 +66,18 @@ func (c *Client) Register(svc string, inst sd.Instance, ttl int64) (func() error
 				if !ok {
 					return
 				}
-			case <-c.ctx.Done():
+			case <-ctx.Done():
 				return
 			}
 		}
 	}()
-	return func() error {
-		_, err := c.cli.Revoke(c.ctx, leaseID)
-		if err != nil {
-			return err
-		}
+	return func() {
+		c.cli.Revoke(c.ctx, leaseID)
 		cancel()
-		return nil
 	}, nil
 }
 
-func (c *Client) Watch(svc string, ch chan<- struct{}) func() error {
+func (c *Client) Watch(svc string, ch chan<- struct{}) func() {
 	ctx, cancel := context.WithCancel(c.ctx)
 	wch := c.cli.Watch(c.ctx, c.servicePrefix(svc), clientv3.WithPrefix())
 	go func() {
@@ -97,9 +93,8 @@ func (c *Client) Watch(svc string, ch chan<- struct{}) func() error {
 			}
 		}
 	}()
-	return func() error {
+	return func() {
 		cancel()
-		return nil
 	}
 }
 

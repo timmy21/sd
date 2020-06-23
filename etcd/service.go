@@ -26,30 +26,12 @@ type Service struct {
 	client      *Client
 	name        string
 	watchStop   func() error
-	unRegister  func() error
 	stopCh      chan struct{}
 	subscribers map[chan<- sd.Event]struct{}
 }
 
-func (s *Service) Register(inst sd.Instance, ttl int64) error {
-	err := s.Unregister()
-	if err != nil {
-		return err
-	}
-
-	unRegister, err := s.client.Register(s.name, inst, ttl)
-	if err != nil {
-		return err
-	}
-	s.unRegister = unRegister
-	return nil
-}
-
-func (s *Service) Unregister() error {
-	if s.unRegister != nil {
-		return s.unRegister()
-	}
-	return nil
+func (s *Service) Register(inst sd.Instance, ttl int64) (func(), error) {
+	return s.client.Register(s.name, inst, ttl)
 }
 
 func (s *Service) Subscribe(ch chan<- sd.Event) {
@@ -96,6 +78,5 @@ func (s *Service) broadcast(evt sd.Event) {
 
 func (s *Service) Stop() error {
 	close(s.stopCh)
-	err := s.Unregister()
-	return err
+	return nil
 }
