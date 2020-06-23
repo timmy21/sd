@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/timmy21/sd"
@@ -13,8 +14,9 @@ import (
 
 func main() {
 	var (
-		svc       = flag.String("service", "", "service name")
-		instID    = flag.String("instance-id", "", "instance id")
+		help      = flag.Bool("-help", false, "print usage")
+		service   = flag.String("service", "test", "service name")
+		instID    = flag.String("instance-id", "ds1", "instance id")
 		instAddr  = flag.String("instance-addr", "127.0.0.1", "instance address")
 		instTTL   = flag.Int64("instance-ttl", 10, "instance ttl (seconds)")
 		endpoints = flag.String("etcd-endpoints", "127.0.0.1:2379", "etcd endpoints")
@@ -22,11 +24,9 @@ func main() {
 	)
 	flag.Parse()
 
-	if *svc == "" {
-		log.Fatal("service name is empty")
-	}
-	if *instID == "" {
-		log.Fatal("inst id is empty")
+	if *help {
+		flag.Usage()
+		os.Exit(0)
 	}
 
 	ctx := context.Background()
@@ -35,19 +35,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s, err := etcd.NewService(client, *svc)
+	svc, err := etcd.NewService(client, *service)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	ch := make(chan sd.Event)
-	s.Subscribe(ch)
+	svc.Subscribe(ch)
 
 	inst := sd.Instance{
 		ID:   *instID,
 		Addr: *instAddr,
 	}
-	err = s.Register(inst, *instTTL)
+	err = svc.Register(inst, *instTTL)
 	if err != nil {
 		log.Fatal(err)
 	}
