@@ -1,23 +1,23 @@
 package sd
 
-type Node struct {
+type Instance struct {
 	ID   string `json:"id"`
 	Addr string `json:"addr"`
 }
 
 type Event struct {
-	Nodes []Node
-	Err   error
+	Instances []Instance
+	Err       error
 }
 
 func (e Event) Copy() Event {
-	nodes := make([]Node, len(e.Nodes))
-	for i, node := range e.Nodes {
-		nodes[i] = node
+	instances := make([]Instance, len(e.Instances))
+	for i, inst := range e.Instances {
+		instances[i] = inst
 	}
 	return Event{
-		Nodes: nodes,
-		Err:   e.Err,
+		Instances: instances,
+		Err:       e.Err,
 	}
 }
 

@@ -31,13 +31,13 @@ type Service struct {
 	subscribers map[chan<- sd.Event]struct{}
 }
 
-func (s *Service) Register(node sd.Node, ttl int64) error {
+func (s *Service) Register(inst sd.Instance, ttl int64) error {
 	err := s.Unregister()
 	if err != nil {
 		return err
 	}
 
-	unRegister, err := s.client.Register(s.name, node, ttl)
+	unRegister, err := s.client.Register(s.name, inst, ttl)
 	if err != nil {
 		return err
 	}
@@ -74,10 +74,10 @@ func (s *Service) run() {
 			if !ok {
 				return
 			}
-			nodes, err := s.client.GetNodes(s.name)
+			instances, err := s.client.GetInstances(s.name)
 			event := sd.Event{
-				Nodes: nodes,
-				Err:   err,
+				Instances: instances,
+				Err:       err,
 			}
 			s.broadcast(event)
 		case <-s.stopCh:

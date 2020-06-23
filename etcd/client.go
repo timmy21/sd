@@ -38,12 +38,12 @@ func NewClient(ctx context.Context, endpoints []string, prefix string, options .
 	}, err
 }
 
-func (c *Client) Register(svc string, node sd.Node, ttl int64) (func() error, error) {
-	val, err := json.Marshal(node)
+func (c *Client) Register(svc string, inst sd.Instance, ttl int64) (func() error, error) {
+	val, err := json.Marshal(inst)
 	if err != nil {
 		return nil, nil
 	}
-	key := c.makeKey(svc, node)
+	key := c.makeKey(svc, inst)
 	resp, err := c.cli.Grant(c.ctx, ttl)
 	if err != nil {
 		return nil, err
@@ -103,25 +103,29 @@ func (c *Client) Watch(svc string, ch chan<- struct{}) func() error {
 	}
 }
 
-func (c *Client) GetNodes(svc string) ([]sd.Node, error) {
+func (c *Client) GetInstances(svc string) ([]sd.Instance, error) {
 	resp, err := c.cli.Get(c.ctx, c.servicePrefix(svc), clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
-	result := make([]sd.Node, 0)
+	result := make([]sd.Instance, 0)
 	for _, kv := range resp.Kvs {
-		var node sd.Node
-		err := json.Unmarshal(kv.Value, &node)
+		var inst sd.Instance
+		err := json.Unmarshal(kv.Value, &inst)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, node)
+		result = append(result, inst)
 	}
 	return result, nil
 }
 
-func (c *Client) makeKey(svc string, node sd.Node) string {
-	return c.servicePrefix(svc) + node.ID
+func (c *Client) Close() error {
+	return c.cli.Close()
+}
+
+func (c *Client) makeKey(svc string, inst sd.Instance) string {
+	return c.servicePrefix(svc) + inst.ID
 }
 
 func (c *Client) servicePrefix(svc string) string {
