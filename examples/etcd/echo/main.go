@@ -14,7 +14,7 @@ import (
 
 func main() {
 	var (
-		help      = flag.Bool("-help", false, "print usage")
+		help      = flag.Bool("help", false, "print usage")
 		service   = flag.String("service", "test", "service name")
 		instID    = flag.String("instance-id", "ds1", "instance id")
 		instAddr  = flag.String("instance-addr", "127.0.0.1", "instance address")

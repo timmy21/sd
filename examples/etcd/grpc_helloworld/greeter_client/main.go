@@ -41,7 +41,7 @@ const (
 
 func main() {
 	var (
-		help      = flag.Bool("-help", false, "print usage")
+		help      = flag.Bool("help", false, "print usage")
 		service   = flag.String("service", "test", "service name")
 		endpoints = flag.String("etcd-endpoints", "127.0.0.1:2379", "etcd endpoints")
 		prefix    = flag.String("etcd-key-prefix", "discovery", "etcd discovery key prefix")

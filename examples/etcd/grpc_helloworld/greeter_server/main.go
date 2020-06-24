@@ -48,7 +48,7 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 
 func main() {
 	var (
-		help      = flag.Bool("-help", false, "print usage")
+		help      = flag.Bool("help", false, "print usage")
 		service   = flag.String("service", "test", "service name")
 		addr      = flag.String("address", "127.0.0.1:50051", "listen address")
 		endpoints = flag.String("etcd-endpoints", "127.0.0.1:2379", "etcd endpoints")
